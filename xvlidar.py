@@ -37,6 +37,10 @@ class XVLidar(object):
     def start(self):
 
         self.thread.start()
+
+    def _read_bytes(self, n):
+
+        return self.ser.read(n).decode('ISO-8859-1')
      
     def _read_lidar(self):
 
@@ -49,7 +53,7 @@ class XVLidar(object):
                 time.sleep(0.001) # do not hog the processor power
 
                 if self.state == 0 :
-                    b = ord(self.ser.read(1).decode('ISO-8859-1'))
+                    b = ord(self._read_bytes(1))
                     # start byte
                     if b == 0xFA :
                         self.state = 1
@@ -57,7 +61,7 @@ class XVLidar(object):
                         self.state = 0
                 elif self.state == 1:
                     # position index
-                    b = ord(self.ser.read(1).decode('ISO-8859-1'))
+                    b = ord(self._read_bytes(1))
                     if b >= 0xA0 and b <= 0xF9 :
                         self.index = b - 0xA0
                         self.state = 2
@@ -65,20 +69,20 @@ class XVLidar(object):
                         self.state = 0
                 elif self.state == 2 :
                     # speed
-                    b_speed = [ ord(b) for b in self.ser.read(2).decode('ISO-8859-1')]
+                    b_speed = [ord(b) for b in self._read_bytes(2)]
                     
                     # data
-                    b_data0 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
-                    b_data1 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
-                    b_data2 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
-                    b_data3 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
+                    b_data0 = [ord(b) for b in self._read_bytes(4)]
+                    b_data1 = [ord(b) for b in self._read_bytes(4)]
+                    b_data2 = [ord(b) for b in self._read_bytes(4)]
+                    b_data3 = [ord(b) for b in self._read_bytes(4)]
 
                     # for the checksum, we need all the data of the packet...
                     # this could be collected in a more elegent fashion...
                     all_data = [ 0xFA, self.index+0xA0 ] + b_speed + b_data0 + b_data1 + b_data2 + b_data3
 
                     # checksum
-                    b_checksum = [ ord(b) for b in self.ser.read(2).decode('ISO-8859-1')]
+                    b_checksum = [ord(b) for b in self._read_bytes(2)]
                     incoming_checksum = int(b_checksum[0]) + (int(b_checksum[1]) << 8)
 
                     # verify that the received checksum is equal to the one computed from the data
