@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
     while True:
         try:
-            print(lidar.getRPM())
+            print('%d RPM' % int(lidar.getRPM()))
         except KeyboardInterrupt:
             exit(0)
 
