@@ -29,7 +29,7 @@ class XVLidar(object):
         self.ser = serial.Serial(port, 115200)
         self.thread = threading.Thread(target=self._read_lidar, args=())
         self.thread.daemon = True
-        self.init_level = 0
+        self.state = 0
         self.index = 0
         self.lidarData = [[] for i in range(360)] #A list of 360 elements Angle, Distance , quality
         self.speed_rpm = 0
@@ -48,22 +48,22 @@ class XVLidar(object):
 
                 time.sleep(0.001) # do not hog the processor power
 
-                if self.init_level == 0 :
+                if self.state == 0 :
                     b = ord(self.ser.read(1))
                     # start byte
                     if b == 0xFA :
-                        self.init_level = 1
+                        self.state = 1
                     else:
-                        self.init_level = 0
-                elif self.init_level == 1:
+                        self.state = 0
+                elif self.state == 1:
                     # position index
                     b = ord(self.ser.read(1))
                     if b >= 0xA0 and b <= 0xF9 :
                         self.index = b - 0xA0
-                        self.init_level = 2
+                        self.state = 2
                     elif b != 0xFA:
-                        self.init_level = 0
-                elif self.init_level == 2 :
+                        self.state = 0
+                elif self.state == 2 :
                     # speed
                     b_speed = [ ord(b) for b in self.ser.read(2)]
                     
@@ -100,10 +100,10 @@ class XVLidar(object):
                         self._update(self.index * 4 + 2, [0, 0x80, 0, 0])
                         self._update(self.index * 4 + 3, [0, 0x80, 0, 0])
                         
-                    self.init_level = 0 # reset and wait for the next packet
+                    self.state = 0 # reset and wait for the next packet
                     
                 else: # default, should never happen...
-                    self.init_level = 0
+                    self.state = 0
             except:
                 print(sys.exc_info())
                 exit(0)
