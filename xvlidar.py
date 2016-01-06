@@ -85,7 +85,7 @@ class XVLidar(object):
 
                     # for the checksum, we need all the data of the packet...
                     # this could be collected in a more elegent fashion...
-                    all_data = [ 0xFA, self.index+0xA0 ] + b_speed + b_data0 + b_data1 + b_data2 + b_data3
+                    all_data = [ 0xFA, self.index+0xA0 ] + data[:18]
 
                     # checksum
                     incoming_checksum = int(b_checksum[0]) + (int(b_checksum[1]) << 8)
