@@ -3,7 +3,7 @@
 '''
 xvlidarplot.py : A little Python class to display scans from the XV Lidar
              
-Copyright (C) 2015 Simon D. Levy
+Copyright (C) 2016 Simon D. Levy
 
 This code is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as 
