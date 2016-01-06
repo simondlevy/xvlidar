@@ -20,7 +20,7 @@
 
 COM_PORT = '/dev/ttyACM0'
 
-import threading, time, serial, sys, traceback
+import threading, time, serial, traceback
 
 class XVLidar(object):
 
