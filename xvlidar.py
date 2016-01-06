@@ -95,19 +95,15 @@ class XVLidar(object):
 
                         self.speed_rpm = self._compute_speed(b_speed)
                         
-                        self._update(self.index * 4 + 0, b_data0)
-                        self._update(self.index * 4 + 1, b_data1)
-                        self._update(self.index * 4 + 2, b_data2)
-                        self._update(self.index * 4 + 3, b_data3)
+                        self._update(0, b_data0)
+                        self._update(1, b_data1)
+                        self._update(2, b_data2)
+                        self._update(3, b_data3)
                     else:
                         # the checksum does not match, something went wrong...
                         nb_errors +=1
+                        print('Checksum fail')
                         
-                        # display the samples in an error state
-                        self._update(self.index * 4 + 0, [0, 0x80, 0, 0])
-                        self._update(self.index * 4 + 1, [0, 0x80, 0, 0])
-                        self._update(self.index * 4 + 2, [0, 0x80, 0, 0])
-                        self._update(self.index * 4 + 3, [0, 0x80, 0, 0])
                         
                     self.state = 0 # reset and wait for the next packet
                     
@@ -117,10 +113,9 @@ class XVLidar(object):
                 traceback.print_exc()
                 exit(0)
 
-    def _update(self, angle, data ):
-        """Updates the view of a sample.
-           Takes the angle (an int, from 0 to 359) and the list of four bytes of data in the order they arrived.
-         """
+    def _update(self, offset, data ):
+
+        angle = self.index * 4 + offset
 
         #unpack data using the denomination used during the discussions
         x = data[0]
