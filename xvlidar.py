@@ -20,7 +20,7 @@
 
 COM_PORT = "/dev/ttyACM0"
 
-import threading, time, serial, sys
+import threading, time, serial, sys, traceback
 
 class XVLidar(object):
 
@@ -49,7 +49,7 @@ class XVLidar(object):
                 time.sleep(0.001) # do not hog the processor power
 
                 if self.state == 0 :
-                    b = ord(self.ser.read(1))
+                    b = ord(self.ser.read(1).decode('ISO-8859-1'))
                     # start byte
                     if b == 0xFA :
                         self.state = 1
@@ -57,7 +57,7 @@ class XVLidar(object):
                         self.state = 0
                 elif self.state == 1:
                     # position index
-                    b = ord(self.ser.read(1))
+                    b = ord(self.ser.read(1).decode('ISO-8859-1'))
                     if b >= 0xA0 and b <= 0xF9 :
                         self.index = b - 0xA0
                         self.state = 2
@@ -65,20 +65,20 @@ class XVLidar(object):
                         self.state = 0
                 elif self.state == 2 :
                     # speed
-                    b_speed = [ ord(b) for b in self.ser.read(2)]
+                    b_speed = [ ord(b) for b in self.ser.read(2).decode('ISO-8859-1')]
                     
                     # data
-                    b_data0 = [ ord(b) for b in self.ser.read(4)]
-                    b_data1 = [ ord(b) for b in self.ser.read(4)]
-                    b_data2 = [ ord(b) for b in self.ser.read(4)]
-                    b_data3 = [ ord(b) for b in self.ser.read(4)]
+                    b_data0 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
+                    b_data1 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
+                    b_data2 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
+                    b_data3 = [ ord(b) for b in self.ser.read(4).decode('ISO-8859-1')]
 
                     # for the checksum, we need all the data of the packet...
                     # this could be collected in a more elegent fashion...
                     all_data = [ 0xFA, self.index+0xA0 ] + b_speed + b_data0 + b_data1 + b_data2 + b_data3
 
                     # checksum
-                    b_checksum = [ ord(b) for b in self.ser.read(2) ]
+                    b_checksum = [ ord(b) for b in self.ser.read(2).decode('ISO-8859-1')]
                     incoming_checksum = int(b_checksum[0]) + (int(b_checksum[1]) << 8)
 
                     # verify that the received checksum is equal to the one computed from the data
@@ -105,7 +105,7 @@ class XVLidar(object):
                 else: # default, should never happen...
                     self.state = 0
             except:
-                print(sys.exc_info())
+                traceback.print_exc()
                 exit(0)
 
     def _update(self, angle, data ):
@@ -120,7 +120,7 @@ class XVLidar(object):
         x3= data[3]
         
         dist_mm = x | (( x1 & 0x3f) << 8) # distance is coded on 13 bits ? 14 bits ?
-        print(angle, dist_mm)
+        print(angle)
         quality = x2 | (x3 << 8) # quality is on 16 bits
         self.lidarData[angle] = [dist_mm,quality]
 
