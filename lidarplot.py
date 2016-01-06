@@ -19,7 +19,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this code.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-COM_PORT                    = '/dev/ttyACM0'
+#COM_PORT                   = 'COM42'           # Windows
+COM_PORT                    = '/dev/ttyACM0'    # Linux
 
 # Arbitrary display params
 DISPLAY_CANVAS_SIZE_PIXELS  = 500
