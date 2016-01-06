@@ -99,6 +99,7 @@ class XVLidar(object):
                         self._update(1, b_data1)
                         self._update(2, b_data2)
                         self._update(3, b_data3)
+
                     else:
                         # the checksum does not match, something went wrong...
                         nb_errors +=1
@@ -109,6 +110,7 @@ class XVLidar(object):
                     
                 else: # default, should never happen...
                     self.state = 0
+
             except:
                 traceback.print_exc()
                 exit(0)
