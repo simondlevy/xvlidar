@@ -69,17 +69,19 @@ class XVLidar(object):
                         self.state = 0
                 elif self.state == 2 :
 
+                    data = [ord(b) for b in self._read_bytes(20)]
+
                     # speed
-                    b_speed = [ord(b) for b in self._read_bytes(2)]
+                    b_speed = data[:2]
                     
                     # data
-                    b_data0 = [ord(b) for b in self._read_bytes(4)]
-                    b_data1 = [ord(b) for b in self._read_bytes(4)]
-                    b_data2 = [ord(b) for b in self._read_bytes(4)]
-                    b_data3 = [ord(b) for b in self._read_bytes(4)]
+                    b_data0 = data[2:6]
+                    b_data1 = data[6:10]
+                    b_data2 = data[10:14]
+                    b_data3 = data[14:18]
 
                     # checksum
-                    b_checksum = [ord(b) for b in self._read_bytes(2)]
+                    b_checksum = data[18:20]
 
                     # for the checksum, we need all the data of the packet...
                     # this could be collected in a more elegent fashion...
