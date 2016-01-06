@@ -18,7 +18,7 @@
     GNU General Public License for more details.
 '''
 
-COM_PORT = "/dev/ttyACM0"
+COM_PORT = '/dev/ttyACM0'
 
 import threading, time, serial, sys, traceback
 
@@ -68,6 +68,7 @@ class XVLidar(object):
                     elif b != 0xFA:
                         self.state = 0
                 elif self.state == 2 :
+
                     # speed
                     b_speed = [ord(b) for b in self._read_bytes(2)]
                     
@@ -77,12 +78,14 @@ class XVLidar(object):
                     b_data2 = [ord(b) for b in self._read_bytes(4)]
                     b_data3 = [ord(b) for b in self._read_bytes(4)]
 
+                    # checksum
+                    b_checksum = [ord(b) for b in self._read_bytes(2)]
+
                     # for the checksum, we need all the data of the packet...
                     # this could be collected in a more elegent fashion...
                     all_data = [ 0xFA, self.index+0xA0 ] + b_speed + b_data0 + b_data1 + b_data2 + b_data3
 
                     # checksum
-                    b_checksum = [ord(b) for b in self._read_bytes(2)]
                     incoming_checksum = int(b_checksum[0]) + (int(b_checksum[1]) << 8)
 
                     # verify that the received checksum is equal to the one computed from the data
