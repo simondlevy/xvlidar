@@ -31,12 +31,25 @@ class XVLidar(object):
         self.thread.daemon = True
         self.state = 0
         self.index = 0
-        self.lidarData = [[] for i in range(360)] #A list of 360 elements Angle, Distance , quality
+        self.lidarData = [[]]*360 # 360 elements (distance,quality), indexed by angle
         self.speed_rpm = 0
 
     def start(self):
 
         self.thread.start()
+
+    def getData(self):
+        '''
+        Returns 360 (distance, quality) tuples.
+        '''
+
+        return self.lidarData
+
+    def getRPM(self):
+        '''
+        Returns speed in RPM.
+        '''
+        return self.speed_rpm
 
     def _read_bytes(self, n):
 
@@ -93,7 +106,7 @@ class XVLidar(object):
                     # verify that the received checksum is equal to the one computed from the data
                     if self._checksum(all_data) == incoming_checksum:
 
-                        self.speed_rpm = self._compute_speed(b_speed)
+                        self.speed_rpm = float( b_speed[0] | (b_speed[1] << 8) ) / 64.0
                         
                         self._update(0, b_data0)
                         self._update(1, b_data1)
@@ -126,7 +139,6 @@ class XVLidar(object):
         x3= data[3]
         
         dist_mm = x | (( x1 & 0x3f) << 8) # distance is coded on 13 bits ? 14 bits ?
-        print(angle)
         quality = x2 | (x3 << 8) # quality is on 16 bits
         self.lidarData[angle] = [dist_mm,quality]
 
@@ -150,11 +162,6 @@ class XVLidar(object):
         return int( checksum )
 
 
-    def _compute_speed(self, data):
-
-        speed_rpm = float( data[0] | (data[1] << 8) ) / 64.0
-        return speed_rpm
-
 if __name__ == '__main__':
 
     lidar = XVLidar(COM_PORT)
@@ -162,7 +169,7 @@ if __name__ == '__main__':
 
     while True:
         try:
-            pass
+            print(lidar.getRPM())
         except KeyboardInterrupt:
             exit(0)
 
