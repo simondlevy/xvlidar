@@ -46,7 +46,7 @@ class XVLidar(object):
         '''
         Returns 360 (distance, quality) tuples.
         '''
-        return self.lidar_data
+        return [pair if len(pair) == 2 else (0,0) for pair in self.lidar_data]
 
     def getRPM(self):
         '''

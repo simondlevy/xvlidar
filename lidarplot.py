@@ -122,7 +122,7 @@ class XVLidarPlotter(tk.Frame):
         while True:
             
             # Lidar sends 360 (distance, quality) pairs, which may be empty on start
-            self.scandata = [pair[0] if len(pair) > 0 else 0 for pair in self.lidar.getScan()]
+            self.scandata = [pair[0] for pair in self.lidar.getScan()]
 
             self.count += 1
 
