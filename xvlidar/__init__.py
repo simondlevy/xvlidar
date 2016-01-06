@@ -2,7 +2,6 @@
 
 '''
     xvlidar.py - Python class for reading from GetSurreal's XV Lidar Controller.  
-    Demo program prints out RPM.
 
     Adapted from lidar.py downloaded from 
 
@@ -19,34 +18,34 @@
     GNU General Public License for more details.
 '''
 
-_COM_PORT = '/dev/ttyACM0'
-
 import threading, time, serial, traceback
 
 class XVLidar(object):
 
-    def __init__(self, port):
-
-        self.ser = serial.Serial(port, 115200)
+    def __init__(self, com_port):
+        '''
+        Opens a serial connection to the XV Lidar on the specifiec com port (e.g.,
+        'COM5', '/dev/ttyACM0').  Connection will run on its own thread.
+        '''
+        self.ser = serial.Serial(com_port, 115200)
         self.thread = threading.Thread(target=self._read_lidar, args=())
         self.thread.daemon = True
         self.state = 0
         self.index = 0
-        self.lidarData = [[]]*360 # 360 elements (distance,quality), indexed by angle
+        self.lidar_data = [()]*360 # 360 elements (distance,quality), indexed by angle
         self.speed_rpm = 0
 
     def start(self):
         '''
-        Starts reading Lidar data on a new thread.
+        Starts reading Lidar data.
         '''
         self.thread.start()
 
-    def getData(self):
+    def getScan(self):
         '''
         Returns 360 (distance, quality) tuples.
         '''
-
-        return self.lidarData
+        return self.lidar_data
 
     def getRPM(self):
         '''
@@ -66,7 +65,7 @@ class XVLidar(object):
 
             try:
 
-                time.sleep(0.001) # do not hog the processor power
+                time.sleep(0.0001) # do not hog the processor power
 
                 if self.state == 0 :
                     b = ord(self._read_bytes(1))
@@ -143,7 +142,7 @@ class XVLidar(object):
         
         dist_mm = x | (( x1 & 0x3f) << 8) # distance is coded on 13 bits ? 14 bits ?
         quality = x2 | (x3 << 8) # quality is on 16 bits
-        self.lidarData[angle] = [dist_mm,quality]
+        self.lidar_data[angle] = dist_mm,quality
 
     def _checksum(self, data):
         """Compute and return the checksum as an int.
@@ -163,17 +162,3 @@ class XVLidar(object):
         checksum = (chk32 & 0x7FFF) + ( chk32 >> 15 ) # wrap around to fit into 15 bits
         checksum = checksum & 0x7FFF # truncate to 15 bits
         return int( checksum )
-
-
-if __name__ == '__main__':
-
-    lidar = XVLidar(_COM_PORT)
-
-    lidar.start()
-
-    while True:
-        try:
-            print('%d RPM' % int(lidar.getRPM()))
-        except KeyboardInterrupt:
-            exit(0)
-
