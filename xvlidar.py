@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 '''
-    xvlidar.py - Python class for reading from GetSurreal's XV Lidar Controller
+    xvlidar.py - Python class for reading from GetSurreal's XV Lidar Controller.  
+    Demo program prints out RPM.
 
     Adapted from lidar.py downloaded from 
 
@@ -18,7 +19,7 @@
     GNU General Public License for more details.
 '''
 
-COM_PORT = '/dev/ttyACM0'
+_COM_PORT = '/dev/ttyACM0'
 
 import threading, time, serial, traceback
 
@@ -35,7 +36,9 @@ class XVLidar(object):
         self.speed_rpm = 0
 
     def start(self):
-
+        '''
+        Starts reading Lidar data on a new thread.
+        '''
         self.thread.start()
 
     def getData(self):
@@ -164,7 +167,8 @@ class XVLidar(object):
 
 if __name__ == '__main__':
 
-    lidar = XVLidar(COM_PORT)
+    lidar = XVLidar(_COM_PORT)
+
     lidar.start()
 
     while True:
