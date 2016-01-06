@@ -142,9 +142,6 @@ class XVLidarPlotter(tk.Frame):
         self.start_sec = time()
         self.showcount = 0
 
-        # Start reading from the Lidar
-        self.lidar.start()
-   
         # Start the recursive timer-task
         plotter._task() 
 

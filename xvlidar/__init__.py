@@ -35,11 +35,6 @@ class XVLidar(object):
         self.index = 0
         self.lidar_data = [()]*360 # 360 elements (distance,quality), indexed by angle
         self.speed_rpm = 0
-
-    def start(self):
-        '''
-        Starts reading Lidar data.
-        '''
         self.thread.start()
 
     def getScan(self):
