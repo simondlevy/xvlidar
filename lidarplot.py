@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 xvlidarplot.py : A little Python class to display scans from the XV Lidar
